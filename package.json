@@ -1,5 +1,5 @@
 {
-  "name": "prelude-react-native-sdk",
+  "name": "@prelude.so/react-native-sdk",
   "version": "0.1.0",
   "description": "Prelude SDK for React Native",
   "main": "build/index.js",
@@ -19,6 +19,16 @@
     "expo",
     "prelude-react-native-sdk",
     "PreludeReactNativeSdk"
+  ],
+  "files": [
+    "android/build.gradle",
+    "android/src/*",
+    "build/*",
+    "ios/*",
+    "scripts/*",
+    "src/*",
+    "expo-module.config.json",
+    "tsconfig.json"
   ],
   "repository": "https://github.com/prelude-so/react-native-sdk",
   "bugs": {

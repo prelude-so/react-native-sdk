@@ -22,7 +22,7 @@ Then, where ever in your application you want to report the device signals you c
 // Import the react state types
 import { useEffect, useState } from "react";
 // Import the SDK types
-import * as PreludeReactNativeSdk from 'prelude-react-native-sdk';
+import * as PreludeReactNativeSdk from '@prelude.so/react-native-sdk';
 ...
 
 // Define a state to receive status updates
