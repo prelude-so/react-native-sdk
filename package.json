@@ -1,6 +1,6 @@
 {
   "name": "@prelude.so/react-native-sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Prelude SDK for React Native",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -50,6 +50,6 @@
     "react-native": "*"
   },
   "so_prelude": {
-    "apple_sdk_tag": "0.1.0"
+    "apple_sdk_tag": "0.1.1"
   }
 }
