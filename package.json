@@ -1,6 +1,6 @@
 {
   "name": "@prelude.so/react-native-sdk",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Prelude SDK for React Native",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -12,7 +12,9 @@
     "prepare": "expo-module prepare",
     "prepublishOnly": "expo-module prepublishOnly",
     "expo-module": "expo-module",
-    "postinstall": "node scripts/postinstall.js"
+    "postinstall": "node scripts/postinstall.js",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "keywords": [
     "react-native",
@@ -40,9 +42,10 @@
   "dependencies": {},
   "devDependencies": {
     "@types/react": "~18.3.12",
+    "expo": "~52.0.46",
     "expo-module-scripts": "^4.0.2",
-    "expo": "~52.0.9",
-    "react-native": "0.76.2"
+    "react": "18.3.12",
+    "react-native": "0.76.9"
   },
   "peerDependencies": {
     "expo": "*",
@@ -50,6 +53,6 @@
     "react-native": "*"
   },
   "so_prelude": {
-    "apple_sdk_tag": "0.1.1"
+    "apple_sdk_tag": "0.2.1"
   }
 }

@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 group = 'so.prelude.reactnative.sdk'
-version = '0.1.0'
+version = '0.2.0'
 
 def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
 apply from: expoModulesCorePlugin
@@ -35,7 +35,7 @@ android {
   namespace "so.prelude.reactnative.sdk"
   defaultConfig {
     versionCode 1
-    versionName "0.1.0"
+    versionName "0.2.0"
   }
   lintOptions {
     abortOnError false
@@ -43,5 +43,5 @@ android {
 }
 
 dependencies {
-  implementation('so.prelude.android:sdk:0.1.0')
+  implementation('so.prelude.android:sdk:0.2.0')
 }
