@@ -1,0 +1,4 @@
+framework module PreludeCore {
+    header "PreludeCore.h"
+    export *
+}
