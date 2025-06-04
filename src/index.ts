@@ -11,7 +11,7 @@ export function onDispatchingSignals(listener: (event: DispatchingSignalsStatus)
   return PreludeReactNativeSdkModule.addListener('onDispatchingSignals', listener);
 }
 
-export async function verifySilent(configuration: { sdk_key: string, request_url: string }): Promise<String> {
+export async function verifySilent(configuration: { sdk_key: string, request_url: string }): Promise<string> {
   return await PreludeReactNativeSdkModule.verifySilent(configuration.sdk_key, configuration.request_url);
 }
 
