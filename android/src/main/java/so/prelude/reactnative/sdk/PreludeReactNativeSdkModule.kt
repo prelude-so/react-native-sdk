@@ -5,7 +5,6 @@ import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import so.prelude.android.sdk.Configuration
 import so.prelude.android.sdk.Configuration.Companion.DEFAULT_REQUEST_TIMEOUT
-import so.prelude.android.sdk.DispatchStatusListener
 import so.prelude.android.sdk.Endpoint
 import so.prelude.android.sdk.Prelude
 import java.net.URL
@@ -14,9 +13,7 @@ class PreludeReactNativeSdkModule : Module() {
     override fun definition() = ModuleDefinition {
         Name("PreludeReactNativeSdk")
 
-        Events("onDispatchingSignals")
-
-        AsyncFunction("dispatchSignals") { sdkKey: String, endpointUrl: String?, timeoutMilliseconds: Long? ->
+        AsyncFunction("dispatchSignals") Coroutine { sdkKey: String, endpointUrl: String?, timeoutMilliseconds: Long? ->
             dispatchSignals(endpointUrl, sdkKey, timeoutMilliseconds)
         }
 
@@ -28,47 +25,39 @@ class PreludeReactNativeSdkModule : Module() {
         }
     }
 
-    private fun dispatchSignals(
+    private suspend fun dispatchSignals(
         endpointUrl: String?,
         sdkKey: String,
         timeoutMilliseconds: Long?
-    ): String? {
+    ): String {
         val endpoint: Endpoint = endpointUrl?.let {
             Endpoint.Custom(it)
         } ?: Endpoint.Default
 
         val context = appContext.reactContext
-        return context?.let {
-            Prelude(
-                Configuration(
-                    it.applicationContext,
-                    sdkKey,
-                    endpoint,
-                    requestTimeout = timeoutMilliseconds ?: DEFAULT_REQUEST_TIMEOUT
-                )
+            ?: throw IllegalStateException(
+                "Invalid React Android Context. Cannot dispatch signals"
             )
-                .dispatchSignals { status: DispatchStatusListener.Status, dispatchId ->
-                    sendEvent(
-                        "onDispatchingSignals", mapOf(
-                            "status" to status,
-                            "dispatchID" to dispatchId
-                        )
-                    )
-                }
-        }
+
+        val config = Configuration(
+            context.applicationContext,
+            sdkKey,
+            endpoint,
+            requestTimeout = timeoutMilliseconds ?: DEFAULT_REQUEST_TIMEOUT
+        )
+        val prelude = Prelude(config)
+                
+        return prelude.dispatchSignals().getOrThrow()
     }
 
     private suspend fun verifySilent(
         sdkKey: String,
         requestUrl: String,
-    ): String? {
+    ): String {
         val context = appContext.reactContext
-
-        if (context == null) {
-            throw IllegalStateException(
+            ?: throw IllegalStateException(
                 "Invalid React Android Context. Cannot perform silent verification"
             )
-        }
 
         if (sdkKey.isBlank() || requestUrl.isBlank()) {
             throw IllegalArgumentException("SDK Key and Request URL must both be provided.")
@@ -76,6 +65,6 @@ class PreludeReactNativeSdkModule : Module() {
 
         val prelude = Prelude(context.applicationContext, sdkKey)
 
-        return prelude.verifySilent(URL(requestUrl)).getOrNull()
+        return prelude.verifySilent(URL(requestUrl)).getOrThrow()
     }
 }

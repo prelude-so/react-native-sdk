@@ -1,6 +1,6 @@
 {
   "name": "@prelude.so/react-native-sdk",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Prelude SDK for React Native",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -26,7 +26,7 @@
     "android/build.gradle",
     "android/src/*",
     "build/*",
-    "ios/*",
+    "ios/Prelude*",
     "scripts/*",
     "src/*",
     "expo-module.config.json",
@@ -41,10 +41,10 @@
   "homepage": "https://github.com/prelude-so/react-native-sdk#readme",
   "dependencies": {},
   "devDependencies": {
-    "@types/react": "~18.3.12",
+    "@types/react": "^18.3.0",
     "expo": "~52.0.46",
     "expo-module-scripts": "^4.0.2",
-    "react": "18.3.12",
+    "react": "^18.3.0",
     "react-native": "0.76.9"
   },
   "peerDependencies": {
