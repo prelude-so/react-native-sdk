@@ -4,24 +4,19 @@ public class PreludeReactNativeSdkModule: Module {
   public func definition() -> ModuleDefinition {
     Name("PreludeReactNativeSdk")
 
-    Events("onDispatchingSignals")
-
-    AsyncFunction("dispatchSignals") { (sdkKey: String, endpointUrl: String?) in
+    AsyncFunction("dispatchSignals") { (sdkKey: String, endpointUrl: String?, timeoutMilliseconds: Int64?) in
         let endpoint = endpointUrl != nil ? Endpoint.custom(endpointUrl!) : .default
+        let timeout = timeoutMilliseconds != nil ? TimeInterval(timeoutMilliseconds!) / 1000 : 2.0
         
         let configuration = Configuration(
             sdkKey: sdkKey,
-            endpoint: endpoint
+            endpoint: endpoint,
+            timeout: timeout
         )
 
         let prelude = Prelude(configuration)
 
-        do {
-            let dispatchID = try await prelude.dispatchSignals()
-            self.sendEvent("onDispatchingSignals", ["status": "SUCCESS", "dispatchID": dispatchID])
-        } catch {
-            self.sendEvent("onDispatchingSignals", ["status": "FAILURE", "dispatchID": error.localizedDescription])
-        }
+        return try await prelude.dispatchSignals()
     }
       
     AsyncFunction("verifySilent") { (sdkKey: String, requestUrl: String) in
