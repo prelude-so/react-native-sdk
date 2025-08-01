@@ -6,47 +6,61 @@ import expo.modules.kotlin.modules.ModuleDefinition
 import so.prelude.android.sdk.Configuration
 import so.prelude.android.sdk.Configuration.Companion.DEFAULT_REQUEST_TIMEOUT
 import so.prelude.android.sdk.Endpoint
+import so.prelude.android.sdk.Features
 import so.prelude.android.sdk.Prelude
 import java.net.URL
 
 class PreludeReactNativeSdkModule : Module() {
-    override fun definition() = ModuleDefinition {
-        Name("PreludeReactNativeSdk")
+    override fun definition() =
+        ModuleDefinition {
+            Name("PreludeReactNativeSdk")
 
-        AsyncFunction("dispatchSignals") Coroutine { sdkKey: String, endpointUrl: String?, timeoutMilliseconds: Long? ->
-            dispatchSignals(endpointUrl, sdkKey, timeoutMilliseconds)
-        }
+            AsyncFunction("dispatchSignals") Coroutine {
+                sdkKey: String,
+                endpointUrl: String?,
+                timeoutMilliseconds: Long?,
+                implementedFeaturesRawValue: Long?,
+                ->
+                dispatchSignals(endpointUrl, sdkKey, timeoutMilliseconds, implementedFeaturesRawValue ?: 0L)
+            }
 
-        AsyncFunction("verifySilent") Coroutine { sdkKey: String, requestUrl: String ->
-            verifySilent(
-                sdkKey = sdkKey,
-                requestUrl = requestUrl
-            )
+            AsyncFunction("verifySilent") Coroutine { sdkKey: String, requestUrl: String ->
+                verifySilent(
+                    sdkKey = sdkKey,
+                    requestUrl = requestUrl,
+                )
+            }
         }
-    }
 
     private suspend fun dispatchSignals(
         endpointUrl: String?,
         sdkKey: String,
-        timeoutMilliseconds: Long?
+        timeoutMilliseconds: Long?,
+        implementedFeaturesRawValue: Long = 0L,
     ): String {
-        val endpoint: Endpoint = endpointUrl?.let {
-            Endpoint.Custom(it)
-        } ?: Endpoint.Default
+        val endpoint: Endpoint =
+            endpointUrl?.let {
+                Endpoint.Custom(
+                    address = it,
+                )
+            } ?: Endpoint.Default
 
-        val context = appContext.reactContext
-            ?: throw IllegalStateException(
-                "Invalid React Android Context. Cannot dispatch signals"
+        val context =
+            appContext.reactContext
+                ?: throw IllegalStateException(
+                    "Invalid React Android Context. Cannot dispatch signals",
+                )
+
+        val config =
+            Configuration(
+                context = context.applicationContext,
+                sdkKey = sdkKey,
+                endpoint = endpoint,
+                requestTimeout = timeoutMilliseconds ?: DEFAULT_REQUEST_TIMEOUT,
+                implementedFeatures = Features.fromRawValue(implementedFeaturesRawValue),
             )
-
-        val config = Configuration(
-            context.applicationContext,
-            sdkKey,
-            endpoint,
-            requestTimeout = timeoutMilliseconds ?: DEFAULT_REQUEST_TIMEOUT
-        )
         val prelude = Prelude(config)
-                
+
         return prelude.dispatchSignals().getOrThrow()
     }
 
@@ -54,10 +68,11 @@ class PreludeReactNativeSdkModule : Module() {
         sdkKey: String,
         requestUrl: String,
     ): String {
-        val context = appContext.reactContext
-            ?: throw IllegalStateException(
-                "Invalid React Android Context. Cannot perform silent verification"
-            )
+        val context =
+            appContext.reactContext
+                ?: throw IllegalStateException(
+                    "Invalid React Android Context. Cannot perform silent verification",
+                )
 
         if (sdkKey.isBlank() || requestUrl.isBlank()) {
             throw IllegalArgumentException("SDK Key and Request URL must both be provided.")
