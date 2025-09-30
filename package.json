@@ -1,6 +1,6 @@
 {
   "name": "@prelude.so/react-native-sdk",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Prelude SDK for React Native",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -30,7 +30,8 @@
     "scripts/*",
     "src/*",
     "expo-module.config.json",
-    "tsconfig.json"
+    "tsconfig.json",
+    "CHANGELOG.md"
   ],
   "repository": "https://github.com/prelude-so/react-native-sdk",
   "bugs": {
@@ -53,6 +54,6 @@
     "react-native": "*"
   },
   "so_prelude": {
-    "apple_sdk_tag": "0.2.3"
+    "apple_sdk_tag": "0.2.4"
   }
 }
