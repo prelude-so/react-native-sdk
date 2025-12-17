@@ -16,12 +16,19 @@ class PreludeReactNativeSdkModule : Module() {
             Name("PreludeReactNativeSdk")
 
             AsyncFunction("dispatchSignals") Coroutine {
-                sdkKey: String,
-                endpointUrl: String?,
-                timeoutMilliseconds: Long?,
-                implementedFeaturesRawValue: Long?,
+                    sdkKey: String,
+                    endpointUrl: String?,
+                    timeoutMilliseconds: Long?,
+                    implementedFeaturesRawValue: Long?,
+                    maxRetries: Int?,
                 ->
-                dispatchSignals(endpointUrl, sdkKey, timeoutMilliseconds, implementedFeaturesRawValue ?: 0L)
+                dispatchSignals(
+                    endpointUrl,
+                    sdkKey,
+                    timeoutMilliseconds ?: 10000L,
+                    implementedFeaturesRawValue ?: 0L,
+                    maxRetries ?: 3
+                )
             }
 
             AsyncFunction("verifySilent") Coroutine { sdkKey: String, requestUrl: String ->
@@ -35,8 +42,9 @@ class PreludeReactNativeSdkModule : Module() {
     private suspend fun dispatchSignals(
         endpointUrl: String?,
         sdkKey: String,
-        timeoutMilliseconds: Long?,
+        timeoutMilliseconds: Long,
         implementedFeaturesRawValue: Long = 0L,
+        maxRetries: Int,
     ): String {
         val endpoint: Endpoint =
             endpointUrl?.let {
@@ -56,8 +64,9 @@ class PreludeReactNativeSdkModule : Module() {
                 context = context.applicationContext,
                 sdkKey = sdkKey,
                 endpoint = endpoint,
-                requestTimeout = timeoutMilliseconds ?: DEFAULT_REQUEST_TIMEOUT,
+                requestTimeout = timeoutMilliseconds,
                 implementedFeatures = Features.fromRawValue(implementedFeaturesRawValue),
+                maxRetries = maxRetries,
             )
         val prelude = Prelude(config)
 
