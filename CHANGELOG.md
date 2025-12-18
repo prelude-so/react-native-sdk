@@ -2,6 +2,11 @@
 
 Prelude React Native SDK Change Log
 
+## [0.3.4] - 2025-12-17
+- Expose `max_retries` argument to allow for customizing the number of automatic retries for network requests
+- Update native components to Android version 0.2.4 and iOS version 0.2.5. New defaults for timeouts and retries included
+- Updated method documentation
+
 ## [0.3.3] - 2025-09-23
 
 - Update native components to Android version 0.2.3 and iOS version 0.2.4 which added Silent Verification support for Bouygues
