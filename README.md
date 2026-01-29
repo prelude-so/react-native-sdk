@@ -84,3 +84,15 @@ The Silent Verification feature allows you to verify a phone number without requ
 It is available for certain carriers and requires a server-side service to handle the verification process. For this verification method to work properly, you *must* collect the device signals mentioned before and report the dispatch identifier to your back-end (usually in your APIs verification endpoint).
 
 Please refer to the [Silent Verification documentation](https://docs.prelude.so/verify/v2/documentation/silent-verification) for more information on how to implement this feature.
+
+#### Uploading your app to the App Store
+
+Depending on the mechanism that you use to upload your app to the App Store, you may find errors related to the `PreludeCore.xcframework` file.
+
+If you encounter this error, try uploading the app again without the `PreludeCore.xcframework` with the flag `--use-old-altool`:
+
+```
+xcrun altool --upload-app --type ios --file "path/to/your/app.ipa" --apiKey "YourAPIKey" --apiIssuer "YourIssuerID" --use-old-altool
+```
+
+If you use `Transporter` it will not allow you to use the `--use-old-altool` flag. You will need to use the `xcrun` command instead.
