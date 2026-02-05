@@ -15,6 +15,22 @@ The SDK is available in npmjs. You can install the SDK dependency directly from 
 npm install @prelude.so/react-native-sdk
 ```
 
+#### Using bun
+
+bun requires you to trust the postinstall script:
+
+```
+bun add --trust @prelude.so/react-native-sdk
+```
+
+#### Using pnpm
+
+pnpm v10+ requires explicit permission for postinstall scripts:
+
+```
+pnpm add --allow-build=@prelude.so/react-native-sdk @prelude.so/react-native-sdk
+```
+
 You will need to have the Prelude SDK key that you generate in the [Prelude dashboard](https://app.prelude.so/) for your account.
 
 ***Important: When you generate the SDK key in the Prelude dashboard, you will be able to copy it, and you should store it somewhere secure, as the dashboard will not allow you to display the same key again.***
