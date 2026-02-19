@@ -2,6 +2,10 @@
 
 Prelude React Native SDK Change Log
 
+## [0.4.0] - 2026-02-18
+
+- Update native Android SDK to version 0.4.1 and iOS SDK to version 0.4.0. These updates include auto-retries during Silent Network Authentication redirection flow, optimized signals collection, and general performance improvements.
+
 ## [0.3.6] - 2026-01-29
 
 - Update native Android SDK to version 0.3.0. It includes improvements in carrier-specific settings for SNA, native libraries handling and obfuscation settings.
