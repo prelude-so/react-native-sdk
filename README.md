@@ -1,4 +1,6 @@
 # Readme
+import AppStoreUpload from './app-store-upload.mdx';
+
 ### Using the Expo React Native SDK
 
 The Expo React Native SDK allows you to capture certain device signals (both in Android and iOS) that will be reported back to Prelude and perform silent verification of mobile devices.
@@ -7,12 +9,30 @@ It is provided as an Expo module that you can integrate into your React Native E
 
 The Android `minSdkVersion` value in the SDK is set to 26 (Android 8.0). If your application has a lower value you may need to update it.
 
-## Usage
+### Setup
 
-The SDK is available in npmjs. You can install the SDK dependency directly from npm:
+#### Using NPM
+
+The SDK is available in npm. You can install the SDK dependency directly using `npm`:
 
 ```
 npm install @prelude.so/react-native-sdk
+```
+
+#### Using Bun
+
+Bun requires you to trust the `postinstall` script:
+
+```
+bun add --trust @prelude.so/react-native-sdk
+```
+
+#### Using pnpm
+
+pnpm v10+ requires explicit permission for `postinstall` scripts:
+
+```
+pnpm add --allow-build=@prelude.so/react-native-sdk @prelude.so/react-native-sdk
 ```
 
 You will need to have the Prelude SDK key that you generate in the [Prelude dashboard](https://app.prelude.so/) for your account.
@@ -85,14 +105,6 @@ It is available for certain carriers and requires a server-side service to handl
 
 Please refer to the [Silent Verification documentation](https://docs.prelude.so/verify/v2/documentation/silent-verification) for more information on how to implement this feature.
 
-#### Uploading your app to the App Store
-
-Depending on the mechanism that you use to upload your app to the App Store, you may find errors related to the `PreludeCore.xcframework` file.
-
-If you encounter this error, try uploading the app again without the `PreludeCore.xcframework` with the flag `--use-old-altool`:
-
-```
-xcrun altool --upload-app --type ios --file "path/to/your/app.ipa" --apiKey "YourAPIKey" --apiIssuer "YourIssuerID" --use-old-altool
-```
+<AppStoreUpload />
 
 If you use `Transporter` it will not allow you to use the `--use-old-altool` flag. You will need to use the `xcrun` command instead.
