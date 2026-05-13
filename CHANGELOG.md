@@ -2,6 +2,10 @@
 
 Prelude React Native SDK Change Log
 
+## [0.5.2] - 2026-05-12
+
+- Update native Android SDK to version 0.5.1, fixing a regression where signal dispatch could fail on Android when transport detection raced a 50ms timeout. iOS unchanged.
+
 ## [0.5.1] - 2026-04-21
 
 - Update native iOS SDK to version 0.5.1. Fixes a build failure introduced in 0.5.0.
