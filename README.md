@@ -1,5 +1,5 @@
 # Readme
-import AppStoreUpload from './app-store-upload.mdx';
+import AppStoreUpload from '/snippets/app-store-upload.mdx';
 
 ### Using the Expo React Native SDK
 
@@ -73,13 +73,13 @@ import * as PreludeReactNativeSdk from '@prelude.so/react-native-sdk';
 
 Then run the Expo application normally (in your application's directory):
 
-```
+```bash
 npx expo run:ios
 ```
 
 or
 
-```
+```bash
 npx expo run:android
 ```
 
