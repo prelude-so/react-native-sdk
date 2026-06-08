@@ -39,6 +39,8 @@ You will need to have the Prelude SDK key that you generate in the [Prelude dash
 
 ***Important: When you generate the SDK key in the Prelude dashboard, you will be able to copy it, and you should store it somewhere secure, as the dashboard will not allow you to display the same key again.***
 
+Because the React Native SDK bridges into the native iOS and Android SDKs at runtime, SDK keys are scoped per platform. Generate one key with the **Apple** platform and one with the **Android** platform in the dashboard, then select the appropriate key at runtime based on `Platform.OS`.
+
 #### Gathering Device Signals
 
 **Note**: Starting with v0.3.0 of the SDK, we have removed the status event and made the `dispatchSignals` function return a promise that resolves to the dispatch identifier, simplifying its usage.

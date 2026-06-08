@@ -2,6 +2,10 @@
 
 Prelude React Native SDK Change Log
 
+## [0.6.0] - 2026-06-08
+
+- Update native Android SDK to version 0.6.1 and iOS SDK to version 0.6.0. These updates add collection of the device screen brightness signal, harden signal dispatch on unstable cellular connections, and prefer validated, Internet-capable network routes.
+
 ## [0.5.2] - 2026-05-12
 
 - Update native Android SDK to version 0.5.1, fixing a regression where signal dispatch could fail on Android when transport detection raced a 50ms timeout. iOS unchanged.
