@@ -1,0 +1,62 @@
+{
+  "name": "@prelude.so/react-native-sdk-shared",
+  "version": "0.1.0",
+  "description": "Shared runtime for the Prelude React Native SDKs",
+  "main": "./build/commonjs/index.js",
+  "module": "./build/module/index.js",
+  "react-native": "./src/index.ts",
+  "source": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./src/index.ts",
+      "react-native": "./src/index.ts",
+      "import": "./build/module/index.js",
+      "require": "./build/commonjs/index.js"
+    },
+    "./web": {
+      "source": "./src/web.ts",
+      "types": "./src/web.ts",
+      "react-native": "./src/web.ts",
+      "import": "./build/module/web.js",
+      "require": "./build/commonjs/web.js"
+    }
+  },
+  "files": [
+    "src",
+    "build",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "bob build",
+    "prepare": "bob build",
+    "typecheck": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prelude-so/react-native-sdk.git",
+    "directory": "packages/prelude-shared"
+  },
+  "author": "Prelude <hello@prelude.so> (https://github.com/prelude-so)",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/prelude-so/react-native-sdk#readme",
+  "dependencies": {
+    "@prelude.so/js-sdk": "^0.12.1"
+  },
+  "devDependencies": {
+    "react-native-builder-bob": "^0.43.0",
+    "typescript": "^6.0.3"
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "build",
+    "targets": [
+      ["commonjs", { "esm": true }],
+      ["module", { "esm": true }]
+    ]
+  }
+}

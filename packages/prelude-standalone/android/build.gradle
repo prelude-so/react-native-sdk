@@ -1,0 +1,73 @@
+buildscript {
+  // Inherit the Kotlin version from the host app so the library tracks whatever
+  // React Native version the consumer uses. Fallbacks cover isolated builds.
+  def kotlinVersion = rootProject.ext.has("kotlinVersion")
+    ? rootProject.ext["kotlinVersion"]
+    : (project.findProperty("PreludeReactNativeSdkStandalone_kotlinVersion") ?: "1.9.25")
+
+  repositories {
+    google()
+    mavenCentral()
+  }
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+  }
+}
+
+def isNewArchitectureEnabled() {
+  return project.hasProperty("newArchEnabled") && project.getProperty("newArchEnabled") == "true"
+}
+
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+
+if (isNewArchitectureEnabled()) {
+  apply plugin: "com.facebook.react"
+}
+
+def safeExtGet(prop, fallback) {
+  rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+android {
+  namespace "so.prelude.reactnative.standalone"
+
+  compileSdkVersion safeExtGet("compileSdkVersion", 34)
+
+  defaultConfig {
+    // The native Prelude Android SDK requires API 26+.
+    minSdkVersion safeExtGet("minSdkVersion", 26)
+    targetSdkVersion safeExtGet("targetSdkVersion", 34)
+    buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+  }
+
+  sourceSets {
+    main {
+      if (isNewArchitectureEnabled()) {
+        java.srcDirs += ["src/newarch"]
+      } else {
+        java.srcDirs += ["src/oldarch"]
+      }
+    }
+  }
+
+  buildFeatures {
+    buildConfig true
+  }
+
+  lintOptions {
+    abortOnError false
+  }
+}
+
+repositories {
+  google()
+  mavenCentral()
+}
+
+dependencies {
+  implementation "com.facebook.react:react-android"
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
+  compileOnly "com.squareup.okhttp3:okhttp:4.12.0"
+  implementation "so.prelude.android:sdk:0.6.1"
+}

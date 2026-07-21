@@ -1,0 +1,7 @@
+node_modules/
+build/
+ios/sdk/
+example/prelude.e2e.json
+*.log
+
+*.tgz

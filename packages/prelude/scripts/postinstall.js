@@ -6,6 +6,13 @@ const { Readable } = require("stream");
 const { finished } = require("stream/promises");
 
 async function main() {
+  // The Apple SDK is only needed for iOS builds. Skip the download when it is
+  // clearly unneeded (e.g. web-only installs or CI that opts out).
+  if (process.env.PRELUDE_SKIP_APPLE_SDK === "1") {
+    logMessage("PRELUDE_SKIP_APPLE_SDK set — skipping Apple SDK download.");
+    return;
+  }
+
   const packagePath = path.resolve(__dirname, "../package.json");
   const sdkPath = path.resolve(__dirname, "../ios/sdk");
   if (fs.existsSync(sdkPath)) {
