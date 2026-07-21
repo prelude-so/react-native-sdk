@@ -1,6 +1,8 @@
 # Readme
 import AppStoreUpload from '/snippets/app-store-upload.mdx';
 
+Prelude ships two React Native SDKs with an identical API. Use `@prelude.so/react-native-sdk` for Expo apps (managed, or bare with Expo modules), and `@prelude.so/react-native-sdk-standalone` for plain React Native apps that don't use Expo. Web behaves the same in both (it delegates to `@prelude.so/js-sdk`).
+
 ### Using the Expo React Native SDK
 
 The Expo React Native SDK allows you to capture certain device signals (both in Android and iOS) that will be reported back to Prelude and perform silent verification of mobile devices.
@@ -37,7 +39,7 @@ pnpm add --allow-build=@prelude.so/react-native-sdk @prelude.so/react-native-sdk
 
 You will need to have the Prelude SDK key that you generate in the [Prelude dashboard](https://app.prelude.so/) for your account.
 
-***Important: When you generate the SDK key in the Prelude dashboard, you will be able to copy it, and you should store it somewhere secure, as the dashboard will not allow you to display the same key again.***
+***Important: When you generate the SDK key in the Prelude dashboard, you will be able to copy it, so keep it somewhere you can retrieve it later, as the dashboard will not allow you to display the same key again. The SDK key is a publishable, client-side key that ships inside your app, so this is about not losing it — not about keeping it secret.***
 
 Because the React Native SDK bridges into the native iOS and Android SDKs at runtime, SDK keys are scoped per platform. Generate one key with the **Apple** platform and one with the **Android** platform in the dashboard, then select the appropriate key at runtime based on `Platform.OS`.
 
@@ -106,6 +108,16 @@ The Silent Verification feature allows you to verify a phone number without requ
 It is available for certain carriers and requires a server-side service to handle the verification process. For this verification method to work properly, you *must* collect the device signals mentioned before and report the dispatch identifier to your back-end (usually in your APIs verification endpoint).
 
 Please refer to the [Silent Verification documentation](https://docs.prelude.so/verify/v2/documentation/silent-verification) for more information on how to implement this feature.
+
+### Using the standalone (no-Expo) React Native SDK
+
+For plain React Native apps that don't use Expo, install `@prelude.so/react-native-sdk-standalone` instead. It exposes the same `dispatchSignals` and `verifySilent` API shown above.
+
+```
+npm install @prelude.so/react-native-sdk-standalone
+```
+
+The React Native Community CLI autolinks the native module. Rebuild after installing (`pod install` for iOS, a Gradle sync for Android). The Android `minSdkVersion` is 26 (Android 8.0). Set `PRELUDE_SKIP_APPLE_SDK=1` to skip the iOS Apple SDK download on Android-only or web-only installs.
 
 <AppStoreUpload />
 

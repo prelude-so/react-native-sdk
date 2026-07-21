@@ -1,0 +1,88 @@
+{
+  "name": "@prelude.so/react-native-sdk-standalone",
+  "version": "0.1.0",
+  "description": "Prelude SDK for React Native (no Expo dependency)",
+  "main": "./build/commonjs/index.js",
+  "module": "./build/module/index.js",
+  "types": "./src/index.ts",
+  "react-native": "./src/index.ts",
+  "source": "./src/index.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./src/index.ts",
+      "react-native": "./src/index.ts",
+      "import": "./build/module/index.js",
+      "require": "./build/commonjs/index.js"
+    }
+  },
+  "scripts": {
+    "build": "bob build",
+    "prepare": "bob build",
+    "clean": "rm -rf build",
+    "typecheck": "tsc --noEmit",
+    "postinstall": "node scripts/postinstall.js"
+  },
+  "keywords": [
+    "react-native",
+    "prelude"
+  ],
+  "files": [
+    "src",
+    "build",
+    "android/build.gradle",
+    "android/gradle.properties",
+    "android/src",
+    "ios/*.swift",
+    "ios/*.h",
+    "ios/*.mm",
+    "scripts/postinstall.js",
+    "PreludeReactNativeSdkStandalone.podspec",
+    "react-native.config.js",
+    "tsconfig.json",
+    "CHANGELOG.md",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prelude-so/react-native-sdk.git",
+    "directory": "packages/prelude-standalone"
+  },
+  "author": "Prelude <hello@prelude.so> (https://github.com/prelude-so)",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/prelude-so/react-native-sdk#readme",
+  "dependencies": {
+    "@prelude.so/react-native-sdk-shared": "^0.1.0"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "react": "^19.2.7",
+    "react-native": "0.86.0",
+    "react-native-builder-bob": "^0.43.0",
+    "typescript": "^6.0.3"
+  },
+  "codegenConfig": {
+    "name": "PreludeReactNativeSdkStandaloneSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "so.prelude.reactnative.standalone"
+    }
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "build",
+    "targets": [
+      ["commonjs", { "esm": true }],
+      ["module", { "esm": true }]
+    ]
+  },
+  "so_prelude": {
+    "apple_sdk_tag": "0.6.0"
+  }
+}
