@@ -8,11 +8,13 @@
 // class here.
 @interface RCT_EXTERN_MODULE(PreludeReactNativeSdkStandalone, NSObject)
 
+// The bridge requires NSNumber arguments to be nonnull; the JavaScript layer
+// resolves optional numeric configuration to defaults before calling.
 RCT_EXTERN_METHOD(dispatchSignals:(NSString *)sdkKey
                   endpoint:(NSString * _Nullable)endpoint
-                  timeoutMilliseconds:(NSNumber * _Nullable)timeoutMilliseconds
-                  implementedFeaturesRawValue:(NSNumber * _Nullable)implementedFeaturesRawValue
-                  maxRetries:(NSNumber * _Nullable)maxRetries
+                  timeoutMilliseconds:(nonnull NSNumber *)timeoutMilliseconds
+                  implementedFeaturesRawValue:(nonnull NSNumber *)implementedFeaturesRawValue
+                  maxRetries:(nonnull NSNumber *)maxRetries
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject)
 

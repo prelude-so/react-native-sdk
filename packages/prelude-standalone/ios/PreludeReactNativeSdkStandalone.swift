@@ -11,31 +11,24 @@ public class PreludeReactNativeSdkStandalone: NSObject {
   public func dispatchSignals(
     _ sdkKey: String,
     endpoint: String?,
-    timeoutMilliseconds: NSNumber?,
-    implementedFeaturesRawValue: NSNumber?,
-    maxRetries: NSNumber?,
+    timeoutMilliseconds: NSNumber,
+    implementedFeaturesRawValue: NSNumber,
+    maxRetries: NSNumber,
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) {
     let endpointValue: Endpoint = endpoint != nil ? .custom(endpoint!) : .default
-    let timeout = timeoutMilliseconds != nil
-      ? TimeInterval(truncating: timeoutMilliseconds!) / 1000
-      : 10.0
+    let timeout = TimeInterval(truncating: timeoutMilliseconds) / 1000
 
-    let features: Features
-    if let raw = implementedFeaturesRawValue {
-      let clamped = raw.int64Value >= 0 ? raw.int64Value : 0
-      features = Features(rawValue: UInt64(clamped))
-    } else {
-      features = []
-    }
+    let rawFeatures = implementedFeaturesRawValue.int64Value
+    let features = Features(rawValue: UInt64(rawFeatures >= 0 ? rawFeatures : 0))
 
     let configuration = Configuration(
       sdkKey: sdkKey,
       endpoint: endpointValue,
       implementedFeatures: features,
       timeout: timeout,
-      maxRetries: maxRetries?.intValue ?? 3
+      maxRetries: maxRetries.intValue
     )
 
     Task {

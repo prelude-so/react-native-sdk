@@ -1,6 +1,11 @@
 import type { PreludeNativeModule } from './nativeModule';
 import { Features, toRawValue } from './features';
 
+// The legacy bridge cannot parse null numeric arguments, so optional numbers
+// always cross the bridge resolved to their documented defaults.
+const DEFAULT_TIMEOUT_MILLISECONDS = 10000;
+const DEFAULT_MAX_RETRIES = 3;
+
 /**
  * Builds the public SDK surface over an injected native module. Each platform
  * supplies its own resolver: the native module on iOS/Android, and the
@@ -29,9 +34,9 @@ export function makeApi(native: PreludeNativeModule) {
     return native.dispatchSignals(
       configuration.sdk_key,
       configuration.endpoint,
-      configuration.timeout_milliseconds,
+      configuration.timeout_milliseconds ?? DEFAULT_TIMEOUT_MILLISECONDS,
       toRawValue(configuration.implemented_features || []),
-      configuration.max_retries,
+      configuration.max_retries ?? DEFAULT_MAX_RETRIES,
     );
   }
 

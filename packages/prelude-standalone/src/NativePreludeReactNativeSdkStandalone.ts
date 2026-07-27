@@ -15,8 +15,30 @@ export interface Spec extends TurboModule {
   verifySilent(sdkKey: string, requestUrl: string): Promise<string>;
 }
 
-// getEnforcing resolves the TurboModule on the New Architecture and falls back
-// to the legacy bridge module on the old one.
-export default TurboModuleRegistry.getEnforcing<Spec>(
-  'PreludeReactNativeSdkStandalone',
-);
+let resolved: Spec | undefined;
+
+// Looked up on first call rather than at import time, so an unlinked module
+// reports itself here instead of resurfacing later as a property access on
+// undefined. Resolution covers the New Architecture and the legacy bridge.
+function native(): Spec {
+  if (resolved === undefined) {
+    resolved =
+      TurboModuleRegistry.get<Spec>('PreludeReactNativeSdkStandalone') ??
+      undefined;
+  }
+  if (resolved === undefined) {
+    throw new Error(
+      'The PreludeReactNativeSdkStandalone native module is not available. ' +
+        'Rebuild the app after installing the package: run `pod install` on ' +
+        'iOS, or resync Gradle on Android.',
+    );
+  }
+  return resolved;
+}
+
+const lazyModule: Spec = {
+  dispatchSignals: (...args) => native().dispatchSignals(...args),
+  verifySilent: (...args) => native().verifySilent(...args),
+};
+
+export default lazyModule;

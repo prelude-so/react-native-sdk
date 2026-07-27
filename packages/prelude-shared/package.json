@@ -1,6 +1,6 @@
 {
   "name": "@prelude.so/react-native-sdk-shared",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Shared runtime for the Prelude React Native SDKs",
   "main": "./build/commonjs/index.js",
   "module": "./build/module/index.js",

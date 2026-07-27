@@ -18,7 +18,7 @@ npm install @prelude.so/react-native-sdk-standalone
 
 The RN Community CLI autolinks the native module. Rebuild after install
 (`pod install` for iOS, gradle sync for Android). Android requires
-`minSdkVersion 26`.
+`minSdkVersion 26` and `compileSdkVersion 35` or later.
 
 ## Usage
 
@@ -42,6 +42,15 @@ const result = await Prelude.verifySilent({
   request_url: "https://...",
 });
 ```
+
+## Web
+
+Web goes through `react-native-web`, like any React Native library: add it plus
+a web bundler (webpack, Rspack, Vite, …) if your app doesn't already build for
+web. On web the SDK delegates to `@prelude.so/js-sdk`, which runs signal
+collection in a Web Worker and ships prebuilt — let your bundler consume it
+as-is (e.g. don't run `@prelude.so/js-sdk` through the React Native Babel
+preset). Follow the js-sdk web setup guidance for bundler specifics.
 
 ## Notes
 
