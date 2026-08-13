@@ -2,6 +2,11 @@
 
 Prelude React Native SDK (Standalone) Change Log
 
+## [0.1.2]
+
+- Update native Android SDK to version 0.6.2. Failed host lookups are now
+  retried instead of ending the request.
+
 ## [0.1.1]
 
 - Fix Android module registration on the legacy bridge (Old Architecture):

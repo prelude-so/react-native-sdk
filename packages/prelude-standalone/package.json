@@ -1,6 +1,6 @@
 {
   "name": "@prelude.so/react-native-sdk-standalone",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Prelude SDK for React Native (no Expo dependency)",
   "main": "./build/commonjs/index.js",
   "module": "./build/module/index.js",
