@@ -15,9 +15,12 @@ Pod::Spec.new do |s|
   s.source         = { :git => "https://github.com/prelude-so/react-native-sdk.git", :tag => "v#{s.version}" }
   s.static_framework = true
 
-  # ios/*.{swift,mm} plus the Apple SDK sources fetched into ios/sdk by the
-  # postinstall script.
-  s.source_files        = "ios/**/*.{swift,h,m,mm}"
+  # The bridge sources plus the Apple SDK sources fetched into ios/sdk by the
+  # postinstall script. The vendored xcframework is deliberately not globbed: it
+  # carries one copy of its headers per slice, and pulling those in as pod
+  # sources makes them public headers that collide ("Multiple commands produce")
+  # once the pod is built as a framework.
+  s.source_files        = "ios/*.{swift,h,m,mm}", "ios/sdk/Sources/**/*.swift"
   s.vendored_frameworks = "ios/sdk/core/PreludeCore.xcframework"
 
   s.pod_target_xcconfig = {

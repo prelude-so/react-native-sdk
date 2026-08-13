@@ -1,5 +1,5 @@
-# Readme
-import AppStoreUpload from '/snippets/app-store-upload.mdx';
+# Prelude React Native SDKs
+
 
 Prelude ships two React Native SDKs with an identical API. Use `@prelude.so/react-native-sdk` for Expo apps (managed, or bare with Expo modules), and `@prelude.so/react-native-sdk-standalone` for plain React Native apps that don't use Expo. Web behaves the same in both (it delegates to `@prelude.so/js-sdk`).
 
@@ -119,6 +119,7 @@ npm install @prelude.so/react-native-sdk-standalone
 
 The React Native Community CLI autolinks the native module. Rebuild after installing (`pod install` for iOS, a Gradle sync for Android). The Android `minSdkVersion` is 26 (Android 8.0). Set `PRELUDE_SKIP_APPLE_SDK=1` to skip the iOS Apple SDK download on Android-only or web-only installs.
 
-<AppStoreUpload />
+On web, the standalone SDK runs through `react-native-web` and your web bundler, delegating to `@prelude.so/js-sdk`. Because js-sdk collects signals in a Web Worker and ships prebuilt, let your bundler consume it as-is and follow the js-sdk web setup guidance.
+
 
 If you use `Transporter` it will not allow you to use the `--use-old-altool` flag. You will need to use the `xcrun` command instead.
