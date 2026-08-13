@@ -9,7 +9,11 @@ The Expo React Native SDK allows you to capture certain device signals (both in 
 
 It is provided as an Expo module that you can integrate into your React Native Expo Application.
 
-The Android `minSdkVersion` value in the SDK is set to 26 (Android 8.0). If your application has a lower value you may need to update it.
+### Requirements
+
+- iOS deployment target **15.1+**
+- Android minimum SDK **API 26** (Android 8.0) — if your application has a lower value you need to raise it
+- Built and tested against Expo SDK **52** / React Native **0.76**; the peer ranges themselves are unpinned
 
 ### Setup
 

@@ -2,6 +2,11 @@
 
 Prelude React Native SDK Change Log
 
+## [0.6.1] - 2026-08-13
+
+- Update native Android SDK to version 0.6.2. Failed host lookups are now
+  retried instead of ending the request.
+
 ## [0.6.0] - 2026-06-08
 
 - Update native Android SDK to version 0.6.1 and iOS SDK to version 0.6.0. These updates add collection of the device screen brightness signal, harden signal dispatch on unstable cellular connections, and prefer validated, Internet-capable network routes.
