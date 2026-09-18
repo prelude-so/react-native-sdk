@@ -54,7 +54,7 @@ preset). Follow the js-sdk web setup guidance for bundler specifics.
 
 ## Notes
 
-- Apple SDK installation is skipped automatically on Linux and Windows. On
+- Apple SDK installation is skipped automatically on platforms other than macOS. On
   macOS, set `PRELUDE_SKIP_APPLE_SDK=1` to skip it for web-only or Android-only
   installs. Downloads and extraction happen in a temporary directory; failures
   warn and let package installation continue without changing an existing SDK.

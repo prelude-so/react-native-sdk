@@ -126,7 +126,7 @@ async function exists(file) {
 for (const scriptName of scripts) {
   const label = path.dirname(path.dirname(scriptName));
 
-  test(`${label}: skips on Linux and Windows even when APPLE_SDK_LOCATION is set`, async (t) => {
+  test(`${label}: skips non-macOS platforms even when APPLE_SDK_LOCATION is set`, async (t) => {
     const info = await fixture(scriptName);
     t.after(() => rm(info.root, { recursive: true, force: true }));
     await mkdir(info.sdkPath, { recursive: true });
@@ -134,7 +134,7 @@ for (const scriptName of scripts) {
     const logs = [];
     let calls = 0;
     const fetchImpl = async () => { calls += 1; throw new Error("fetch must not be called"); };
-    for (const platform of ["linux", "win32"]) {
+    for (const platform of ["linux", "win32", "freebsd", "openbsd", "aix", "sunos"]) {
       await runScript(info, { platform, env: { APPLE_SDK_LOCATION: "/does/not/exist" }, fetchImpl, logs });
     }
     assert.equal(calls, 0);

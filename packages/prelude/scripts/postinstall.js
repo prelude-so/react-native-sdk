@@ -12,7 +12,7 @@ async function main() {
     return;
   }
 
-  if (process.platform === "linux" || process.platform === "win32") {
+  if (process.platform !== "darwin") {
     logMessage(`Skipping Apple SDK download on ${process.platform}.`);
     return;
   }

@@ -43,8 +43,8 @@ pnpm add --allow-build=@prelude.so/react-native-sdk @prelude.so/react-native-sdk
 
 #### Apple SDK installation
 
-Both React Native packages skip Apple SDK installation automatically on Linux
-and Windows. On macOS, set `PRELUDE_SKIP_APPLE_SDK=1` for web-only or Android-only
+Both React Native packages install the Apple SDK only on macOS, skipping it
+automatically on other platforms. Set `PRELUDE_SKIP_APPLE_SDK=1` for web-only or Android-only
 installs to skip the download as well.
 
 The installer downloads and extracts into a temporary directory before replacing

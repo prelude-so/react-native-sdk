@@ -18,7 +18,7 @@ First install the SDK dependency in your app:
 npm install @prelude.so/react-native-sdk
 ```
 
-Apple SDK installation is skipped automatically on Linux and Windows. On macOS,
+Apple SDK installation is skipped automatically on platforms other than macOS. On macOS,
 set `PRELUDE_SKIP_APPLE_SDK=1` to skip it for web-only or Android-only installs.
 Downloads and extraction happen in a temporary directory; if they fail, the
 installer warns and continues without changing an existing SDK. The Apple SDK
