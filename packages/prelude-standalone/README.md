@@ -54,6 +54,11 @@ preset). Follow the js-sdk web setup guidance for bundler specifics.
 
 ## Notes
 
-- iOS pulls the Apple SDK sources on install. Set `PRELUDE_SKIP_APPLE_SDK=1` to
-  skip that download (e.g. web-only or Android-only CI).
+- Apple SDK installation is skipped automatically on Linux and Windows. On
+  macOS, set `PRELUDE_SKIP_APPLE_SDK=1` to skip it for web-only or Android-only
+  installs. Downloads and extraction happen in a temporary directory; failures
+  warn and let package installation continue without changing an existing SDK.
+  The Apple SDK may then be missing or out of date. Before building iOS, unset
+  the skip flag and run `npm rebuild --foreground-scripts @prelude.so/react-native-sdk-standalone` on
+  macOS to retry. Downloads are attempted once, without automatic retries.
 - Web accepts `timeout_milliseconds` / `max_retries` for parity but ignores them.

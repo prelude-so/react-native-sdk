@@ -18,6 +18,14 @@ First install the SDK dependency in your app:
 npm install @prelude.so/react-native-sdk
 ```
 
+Apple SDK installation is skipped automatically on Linux and Windows. On macOS,
+set `PRELUDE_SKIP_APPLE_SDK=1` to skip it for web-only or Android-only installs.
+Downloads and extraction happen in a temporary directory; if they fail, the
+installer warns and continues without changing an existing SDK. The Apple SDK
+may then be missing or out of date. Before building iOS, unset the skip flag and
+run `npm rebuild --foreground-scripts @prelude.so/react-native-sdk` on macOS to retry. Downloads are
+attempted once, without automatic retries.
+
 Then, where ever in your application you want to report the device signals you can use code like this:
 
 ```

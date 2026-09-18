@@ -41,6 +41,23 @@ pnpm v10+ requires explicit permission for `postinstall` scripts:
 pnpm add --allow-build=@prelude.so/react-native-sdk @prelude.so/react-native-sdk
 ```
 
+#### Apple SDK installation
+
+Both React Native packages skip Apple SDK installation automatically on Linux
+and Windows. On macOS, set `PRELUDE_SKIP_APPLE_SDK=1` for web-only or Android-only
+installs to skip the download as well.
+
+The installer downloads and extracts into a temporary directory before replacing
+an existing SDK. If downloading or extraction fails, package installation
+continues with a warning and the existing SDK is left untouched. On a fresh
+install, the Apple SDK will remain missing; after an upgrade, an existing SDK may
+be out of date. Before building iOS, unset `PRELUDE_SKIP_APPLE_SDK` and retry on
+macOS with `npm rebuild --foreground-scripts @prelude.so/react-native-sdk` (or
+`npm rebuild --foreground-scripts @prelude.so/react-native-sdk-standalone` for the standalone package).
+Downloads are attempted once; no automatic retries are added.
+The rebuild commands use `--foreground-scripts` so npm shows the installer's
+output, including warnings that it can otherwise hide for successful scripts.
+
 You will need to have the Prelude SDK key that you generate in the [Prelude dashboard](https://app.prelude.so/) for your account.
 
 ***Important: When you generate the SDK key in the Prelude dashboard, you will be able to copy it, so keep it somewhere you can retrieve it later, as the dashboard will not allow you to display the same key again. The SDK key is a publishable, client-side key that ships inside your app, so this is about not losing it — not about keeping it secret.***

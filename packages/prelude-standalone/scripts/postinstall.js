@@ -1,9 +1,8 @@
 const fs = require("fs");
 const child_process = require("node:child_process");
-const util = require("node:util");
 const path = require("path");
 const { Readable } = require("stream");
-const { finished } = require("stream/promises");
+const { pipeline } = require("stream/promises");
 
 async function main() {
   // The Apple SDK is only needed for iOS builds. Skip the download when it is
@@ -13,21 +12,48 @@ async function main() {
     return;
   }
 
+  if (process.platform === "linux" || process.platform === "win32") {
+    logMessage(`Skipping Apple SDK download on ${process.platform}.`);
+    return;
+  }
+
   const packagePath = path.resolve(__dirname, "../package.json");
   const sdkPath = path.resolve(__dirname, "../ios/sdk");
-  if (fs.existsSync(sdkPath)) {
-    fs.rmSync(sdkPath, { recursive: true });
-  }
-  fs.mkdirSync(sdkPath, { recursive: true });
   const packageFile = require(packagePath);
   const appleSdkVersion = packageFile.so_prelude.apple_sdk_tag;
   const appleSdkSources =
     process.env.APPLE_SDK_LOCATION ||
     `https://github.com/prelude-so/apple-sdk/archive/refs/tags/${appleSdkVersion}.zip`;
 
-  await configureSources(appleSdkSources, sdkPath, appleSdkVersion);
+  fs.mkdirSync(path.dirname(sdkPath), { recursive: true });
+  const temporaryPath = fs.mkdtempSync(
+    path.join(path.dirname(sdkPath), ".prelude-sdk-"),
+  );
+  const stagingPath = path.join(temporaryPath, "sdk");
+  const backupPath = path.join(temporaryPath, "previous-sdk");
+  try {
+    fs.mkdirSync(stagingPath);
+    await configureSources(appleSdkSources, stagingPath, appleSdkVersion);
 
-  logSuccess("The Prelude Apple SDK has been successfully configured.");
+    if (fs.existsSync(sdkPath)) {
+      fs.renameSync(sdkPath, backupPath);
+    }
+    try {
+      fs.renameSync(stagingPath, sdkPath);
+    } catch (error) {
+      if (fs.existsSync(backupPath)) {
+        fs.renameSync(backupPath, sdkPath);
+      }
+      throw error;
+    }
+    fs.rmSync(backupPath, { recursive: true, force: true });
+    logSuccess("The Prelude Apple SDK has been successfully configured.");
+  } finally {
+    // Keep the backup if restoring it failed.
+    if (!fs.existsSync(backupPath)) {
+      fs.rmSync(temporaryPath, { recursive: true, force: true });
+    }
+  }
 }
 
 async function configureSources(sourcesPath, localSdkPath, appleSdkVersion) {
@@ -54,9 +80,15 @@ async function configureFromUrl(url, localSdkPath, appleSdkVersion) {
   const xcframeworkUrl = await extractXcFrameworkUrl(swiftPackage);
   logMessage("Downloading the Prelude Apple SDK binaries...");
   const xcframeworkFileName = xcframeworkUrl.split("/").pop();
-  await downloadFile(xcframeworkUrl, `${localSdkPath}/tmp/${xcframeworkFileName}`);
+  await downloadFile(
+    xcframeworkUrl,
+    `${localSdkPath}/tmp/${xcframeworkFileName}`,
+  );
 
-  unzip(`${localSdkPath}/tmp/${xcframeworkFileName}`, `${localSdkPath}/tmp/core/`);
+  unzip(
+    `${localSdkPath}/tmp/${xcframeworkFileName}`,
+    `${localSdkPath}/tmp/core/`,
+  );
   fs.renameSync(`${localSdkPath}/tmp/core/`, `${localSdkPath}/core`);
 
   fs.rmSync(`${localSdkPath}/tmp`, { recursive: true, force: true });
@@ -66,15 +98,19 @@ async function extractXcFrameworkUrl(packageFileName) {
   const readline = require("node:readline");
   const fileStream = fs.createReadStream(packageFileName);
 
-  const rl = readline.createInterface({ input: fileStream, crlfDelay: Infinity });
+  const rl = readline.createInterface({
+    input: fileStream,
+    crlfDelay: Infinity,
+  });
   for await (const line of rl) {
     if (line.includes("url:") && line.includes("xcframework.zip")) {
-      return line
+      const xcframeworkUrl = line
         .trim()
         .replace("url:", "")
         .replaceAll('"', "")
         .replace(",", "")
         .trim();
+      return xcframeworkUrl;
     }
   }
 }
@@ -88,16 +124,13 @@ const downloadFile = async (url, fileName) => {
   }
   fs.rmSync(fileName, { force: true });
   const fileStream = fs.createWriteStream(fileName, { flags: "wx" });
-  await finished(Readable.fromWeb(res.body).pipe(fileStream));
+  await pipeline(Readable.fromWeb(res.body), fileStream);
 };
 
-const exec = util.promisify(child_process.execSync);
-
-async function unzip(fileName, destination) {
-  const result = await exec("unzip " + fileName + " -d " + destination, {
+function unzip(fileName, destination) {
+  child_process.execFileSync("unzip", [fileName, "-d", destination], {
     stdio: "inherit",
   });
-  logMessage(result.stdout);
 }
 
 function logMessage(msg) {
@@ -109,5 +142,14 @@ function logSuccess(msg) {
 }
 
 (async () => {
-  await main();
+  try {
+    await main();
+  } catch (error) {
+    const packageName = require("../package.json").name;
+    console.warn(
+      `Warning: Could not configure the Prelude Apple SDK: ${error.message}\n` +
+        "Continuing package installation. The Apple SDK may be missing or out of date. " +
+        `Before building iOS, run \`npm rebuild --foreground-scripts ${packageName}\` on macOS with PRELUDE_SKIP_APPLE_SDK unset.`,
+    );
+  }
 })();
