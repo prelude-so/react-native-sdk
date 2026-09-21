@@ -12,6 +12,10 @@ async function main() {
     logMessage("PRELUDE_SKIP_APPLE_SDK set — skipping Apple SDK download.");
     return;
   }
+  if (process.platform !== "darwin") {
+    logMessage(`Skipping Apple SDK download on ${process.platform}: iOS builds only run on macOS.`);
+    return;
+  }
 
   const packagePath = path.resolve(__dirname, "../package.json");
   const sdkPath = path.resolve(__dirname, "../ios/sdk");
@@ -89,8 +93,32 @@ async function extractXcFrameworkUrl(packageFileName) {
   }
 }
 
+const MAX_ATTEMPTS = 5;
+
+const isRetryable = (res) => res.status >= 500 || res.status === 429;
+
+const fetchWithRetries = async (url) => {
+  for (let attempt = 1; ; attempt++) {
+    let res;
+    let failure;
+    try {
+      res = await fetch(url, { signal: AbortSignal.timeout(60_000) });
+      if (res.ok || !isRetryable(res)) return res;
+      failure = res.statusText;
+    } catch (err) {
+      failure = err.cause?.message ?? err.message;
+    }
+    if (attempt === MAX_ATTEMPTS) {
+      throw new Error(`Error downloading the Prelude Apple SDK after ${MAX_ATTEMPTS} attempts: ${failure}. Tried ${url}.`);
+    }
+    const delay = 1000 * 2 ** (attempt - 1);
+    logMessage(`Attempt ${attempt}/${MAX_ATTEMPTS} failed (${failure}), retrying in ${delay / 1000}s.`);
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+};
+
 const downloadFile = async (url, fileName) => {
-  const res = await fetch(url);
+  const res = await fetchWithRetries(url);
   if (!res.ok) {
     throw new Error(
       `Error downloading the Prelude Apple SDK. Response: ${res.statusText}. Tried ${url}.`,
