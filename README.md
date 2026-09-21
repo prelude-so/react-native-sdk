@@ -12,7 +12,7 @@ It is provided as an Expo module that you can integrate into your React Native E
 ### Requirements
 
 - iOS deployment target **15.1+**
-- Android minimum SDK **API 26** (Android 8.0) — if your application has a lower value you need to raise it
+- Android minimum SDK **API 26** (Android 8.0), if your application has a lower value you need to raise it
 - Built and tested against Expo SDK **52** / React Native **0.76**; the peer ranges themselves are unpinned
 
 ### Setup
@@ -43,7 +43,7 @@ pnpm add --allow-build=@prelude.so/react-native-sdk @prelude.so/react-native-sdk
 
 You will need to have the Prelude SDK key that you generate in the [Prelude dashboard](https://app.prelude.so/) for your account.
 
-***Important: When you generate the SDK key in the Prelude dashboard, you will be able to copy it, so keep it somewhere you can retrieve it later, as the dashboard will not allow you to display the same key again. The SDK key is a publishable, client-side key that ships inside your app, so this is about not losing it — not about keeping it secret.***
+***Important: When you generate the SDK key in the Prelude dashboard, you will be able to copy it, so keep it somewhere you can retrieve it later, as the dashboard will not allow you to display the same key again. The SDK key is a publishable, client-side key that ships inside your app, so this is about not losing it, not about keeping it secret.***
 
 Because the React Native SDK bridges into the native iOS and Android SDKs at runtime, SDK keys are scoped per platform. Generate one key with the **Apple** platform and one with the **Android** platform in the dashboard, then select the appropriate key at runtime based on `Platform.OS`.
 
@@ -121,7 +121,7 @@ For plain React Native apps that don't use Expo, install `@prelude.so/react-nati
 npm install @prelude.so/react-native-sdk-standalone
 ```
 
-The React Native Community CLI autolinks the native module. Rebuild after installing (`pod install` for iOS, a Gradle sync for Android). The Android `minSdkVersion` is 26 (Android 8.0). Set `PRELUDE_SKIP_APPLE_SDK=1` to skip the iOS Apple SDK download on Android-only or web-only installs.
+The React Native Community CLI autolinks the native module. Rebuild after installing (`pod install` for iOS, a Gradle sync for Android). The Android `minSdkVersion` is 26 (Android 8.0). The iOS Apple SDK download in `postinstall` only runs on macOS and retries transient GitHub failures. Set `PRELUDE_SKIP_APPLE_SDK=1` to skip it on Android-only or web-only installs.
 
 On web, the standalone SDK runs through `react-native-web` and your web bundler, delegating to `@prelude.so/js-sdk`. Because js-sdk collects signals in a Web Worker and ships prebuilt, let your bundler consume it as-is and follow the js-sdk web setup guidance.
 

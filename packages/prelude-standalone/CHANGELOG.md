@@ -2,6 +2,12 @@
 
 Prelude React Native SDK (Standalone) Change Log
 
+## [0.1.3]
+
+- Make the Apple SDK `postinstall` download resilient: skip it on non-macOS
+  hosts and retry transient GitHub failures (5xx, timeouts) up to 5 times with
+  backoff (prelude-so/react-native-sdk#30).
+
 ## [0.1.2]
 
 - Update native Android SDK to version 0.6.2. Failed host lookups are now
