@@ -54,7 +54,9 @@ install, the Apple SDK will remain missing; after an upgrade, an existing SDK ma
 be out of date. Before building iOS, unset `PRELUDE_SKIP_APPLE_SDK` and retry on
 macOS with `npm rebuild --foreground-scripts @prelude.so/react-native-sdk` (or
 `npm rebuild --foreground-scripts @prelude.so/react-native-sdk-standalone` for the standalone package).
-Downloads are attempted once; no automatic retries are added.
+Transient request failures use the existing retry policy: up to five attempts,
+with a 60-second timeout per attempt. If these are exhausted, the installer warns
+and preserves the existing SDK as described above.
 The rebuild commands use `--foreground-scripts` so npm shows the installer's
 output, including warnings that it can otherwise hide for successful scripts.
 

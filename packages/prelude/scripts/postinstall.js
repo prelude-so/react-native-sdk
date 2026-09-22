@@ -16,11 +16,6 @@ async function main() {
     return;
   }
 
-  if (process.platform !== "darwin") {
-    logMessage(`Skipping Apple SDK download on ${process.platform}.`);
-    return;
-  }
-
   const packagePath = path.resolve(__dirname, "../package.json");
   const sdkPath = path.resolve(__dirname, "../ios/sdk");
   const packageFile = require(packagePath);

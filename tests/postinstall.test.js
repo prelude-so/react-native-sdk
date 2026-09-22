@@ -65,7 +65,7 @@ async function binaryArchive(root) {
   return archive;
 }
 
-async function runScript(fixtureInfo, { platform = "darwin", env = {}, fetchImpl, logs = [], fsImpl } = {}) {
+async function runScript(fixtureInfo, { platform = "darwin", env = {}, fetchImpl, logs = [], fsImpl, delays = [] } = {}) {
   const scriptPath = path.join(fixtureInfo.packageRoot, "scripts", "postinstall.js");
   const source = await readFile(scriptPath, "utf8");
   const processShim = {
@@ -83,6 +83,9 @@ async function runScript(fixtureInfo, { platform = "darwin", env = {}, fetchImpl
     },
     process: processShim,
     fetch: fetchImpl,
+    AbortSignal,
+    // Exercise retries without waiting for real backoff timers.
+    setTimeout: (callback, delay) => { delays.push(delay); callback(); },
     require: (name) => name === "fs" && fsImpl ? fsImpl : createRequire(scriptPath)(name),
     module: { exports: {} },
     exports: {},
@@ -166,26 +169,34 @@ for (const scriptName of scripts) {
       fetchImpl: async () => { calls += 1; return response(Buffer.from("unavailable"), 503, "Service Unavailable"); },
       logs,
     });
-    assert.equal(calls, 1);
+    assert.equal(calls, 5);
     assertInstallWarning(logs);
     assert.match(logs.join("\n"), /Service Unavailable/);
     assert.equal(await exists(info.sdkPath), false);
     await assertNoStaging(info, false);
   });
 
-  test(`${label}: preserves an existing SDK after source download failure`, async (t) => {
+  test(`${label}: preserves an existing SDK throughout source retries and after exhaustion`, async (t) => {
     const info = await fixture(scriptName);
     t.after(() => rm(info.root, { recursive: true, force: true }));
     await mkdir(path.join(info.sdkPath, "Sources"), { recursive: true });
     await writeFile(path.join(info.sdkPath, "Sources", "old.swift"), "old SDK\n");
     const logs = [];
+    const delays = [];
     let calls = 0;
     await runScript(info, {
-      fetchImpl: async () => { calls += 1; return response(Buffer.from("unavailable"), 503, "Service Unavailable"); },
+      fetchImpl: async () => {
+        calls += 1;
+        assert.equal(await readFile(path.join(info.sdkPath, "Sources", "old.swift"), "utf8"), "old SDK\n");
+        return response(Buffer.from("unavailable"), 503, "Service Unavailable");
+      },
       logs,
+      delays,
     });
-    assert.equal(calls, 1);
+    assert.equal(calls, 5);
+    assert.deepEqual(delays, [1000, 2000, 4000, 8000]);
     assertInstallWarning(logs);
+    assert.match(logs.join("\n"), /after 5 attempts: Service Unavailable/);
     assert.equal(await readFile(path.join(info.sdkPath, "Sources", "old.swift"), "utf8"), "old SDK\n");
     await assertNoStaging(info, true);
   });
@@ -216,7 +227,7 @@ for (const scriptName of scripts) {
       fetchImpl: async () => { calls += 1; throw new Error("network unavailable"); },
       logs,
     });
-    assert.equal(calls, 1);
+    assert.equal(calls, 5);
     assertInstallWarning(logs);
     assert.match(logs.join("\n"), /network unavailable/);
     await assertNoStaging(info, false);
@@ -237,7 +248,7 @@ for (const scriptName of scripts) {
     await assertNoStaging(info, false);
   });
 
-  test(`${label}: preserves an existing SDK after binary HTTP failure`, async (t) => {
+  test(`${label}: preserves an existing SDK throughout binary retries and after exhaustion`, async (t) => {
     const info = await fixture(scriptName);
     t.after(() => rm(info.root, { recursive: true, force: true }));
     const fixtureRoot = await mkdtemp(path.join(require("node:os").tmpdir(), "prelude-zips-"));
@@ -247,6 +258,7 @@ for (const scriptName of scripts) {
     await writeFile(path.join(info.sdkPath, "old.txt"), "old SDK\n");
     let calls = 0;
     const logs = [];
+    const delays = [];
     await runScript(info, {
       fetchImpl: async (url) => {
         calls += 1;
@@ -256,9 +268,12 @@ for (const scriptName of scripts) {
           : response(Buffer.from("unavailable"), 502, "Bad Gateway");
       },
       logs,
+      delays,
     });
-    assert.equal(calls, 2);
+    assert.equal(calls, 6);
+    assert.deepEqual(delays, [1000, 2000, 4000, 8000]);
     assertInstallWarning(logs);
+    assert.match(logs.join("\n"), /after 5 attempts: Bad Gateway/);
     assert.equal(await readFile(path.join(info.sdkPath, "old.txt"), "utf8"), "old SDK\n");
     await assertNoStaging(info, true);
   });
@@ -287,7 +302,7 @@ for (const scriptName of scripts) {
     await assertNoStaging(info, true);
   });
 
-  test(`${label}: replaces an existing SDK only after both archives succeed`, async (t) => {
+  test(`${label}: replaces an existing SDK only after both downloads recover and extract`, async (t) => {
     const info = await fixture(scriptName);
     t.after(() => rm(info.root, { recursive: true, force: true }));
     const fixtureRoot = await mkdtemp(path.join(require("node:os").tmpdir(), "prelude-zips-"));
@@ -297,14 +312,24 @@ for (const scriptName of scripts) {
     await mkdir(info.sdkPath, { recursive: true });
     await writeFile(path.join(info.sdkPath, "old.txt"), "old SDK\n");
     let calls = 0;
+    const logs = [];
+    const delays = [];
     await runScript(info, {
       fetchImpl: async (url) => {
         calls += 1;
         assert.equal(await readFile(path.join(info.sdkPath, "old.txt"), "utf8"), "old SDK\n");
-        return calls === 1 ? response(await readFile(sourceZip)) : response(await readFile(binaryZip));
+        if (calls === 1) return response(Buffer.from("unavailable"), 503, "Service Unavailable");
+        if (calls === 2) return response(await readFile(sourceZip));
+        if (calls === 3) throw new Error("connection timed out");
+        return response(await readFile(binaryZip));
       },
+      logs,
+      delays,
     });
-    assert.equal(calls, 2);
+    assert.equal(calls, 4);
+    assert.deepEqual(delays, [1000, 1000]);
+    assert.match(logs.join("\n"), /successfully configured/);
+    assert.doesNotMatch(logs.join("\n"), /Warning:/);
     assert.equal(await exists(path.join(info.sdkPath, "old.txt")), false);
     assert.equal(await readFile(path.join(info.sdkPath, "Sources", "Prelude.swift"), "utf8"), "public struct Prelude {}\n");
     assert.equal(await readFile(path.join(info.sdkPath, "core", "Prelude.xcframework", "Info.plist"), "utf8"), "fixture binary\n");

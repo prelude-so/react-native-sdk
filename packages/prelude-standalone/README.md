@@ -60,5 +60,7 @@ preset). Follow the js-sdk web setup guidance for bundler specifics.
   warn and let package installation continue without changing an existing SDK.
   The Apple SDK may then be missing or out of date. Before building iOS, unset
   the skip flag and run `npm rebuild --foreground-scripts @prelude.so/react-native-sdk-standalone` on
-  macOS to retry. Downloads are attempted once, without automatic retries.
+  macOS to retry. Transient request failures retain the existing five-attempt
+  retry policy; the installer warns and preserves the existing SDK when those
+  attempts are exhausted.
 - Web accepts `timeout_milliseconds` / `max_retries` for parity but ignores them.
