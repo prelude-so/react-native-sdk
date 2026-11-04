@@ -64,6 +64,17 @@ android {
   }
 }
 
+// The Android SDK is served through the app's distribution link, which the app
+// registers as a Maven repository in its android/build.gradle (see the README).
+// Checked here so a missing link fails with a clear message.
+def preludeLinkRepository = rootProject.allprojects.any { p ->
+  p.repositories.any { it instanceof MavenArtifactRepository && it.url.toString() ==~ /.*\/dis_[0-9a-z]{26}\/maven\/?/ }
+}
+if (!preludeLinkRepository) {
+  throw new GradleException("Prelude: add the Maven repository link of your app, from the Prelude Dashboard, to allprojects.repositories in android/build.gradle.")
+}
+def preludeSdkVersion = new groovy.json.JsonSlurper().parse(file("../package.json")).so_prelude.android_sdk_version
+
 repositories {
   google()
   mavenCentral()
@@ -73,5 +84,5 @@ dependencies {
   implementation "com.facebook.react:react-android"
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
   compileOnly "com.squareup.okhttp3:okhttp:4.12.0"
-  implementation "so.prelude.android:sdk:0.6.2"
+  implementation "so.prelude.android:sdk:${preludeSdkVersion}"
 }

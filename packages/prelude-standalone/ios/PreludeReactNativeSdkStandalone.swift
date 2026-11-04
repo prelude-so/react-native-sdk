@@ -1,9 +1,9 @@
 import Foundation
+import PreludeSignals
 import React
 
-// Prelude Swift symbols (Prelude, Configuration, Endpoint, Features) come from
-// the vendored SDK sources compiled into this pod. RCTPromise* block types come
-// from React-Core (imported above), pulled in by install_modules_dependencies.
+// RCTPromise* block types come from React-Core, pulled in by
+// install_modules_dependencies.
 @objc(PreludeReactNativeSdkStandalone)
 public class PreludeReactNativeSdkStandalone: NSObject {
 
