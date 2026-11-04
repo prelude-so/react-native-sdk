@@ -18,6 +18,19 @@ First install the SDK dependency in your app:
 npm install @prelude.so/react-native-sdk
 ```
 
+The native SDKs are served through your app's distribution links from the
+Prelude Dashboard. Pass both to the config plugin in `app.json`:
+
+```json
+["@prelude.so/react-native-sdk", {
+  "androidSdkUrl": "https://<host>/dis_.../maven",
+  "iosSdkUrl": "https://<host>/dis_.../apple-sdk.git"
+}]
+```
+
+Without the plugin, add the Maven link to `allprojects.repositories` in
+`android/build.gradle` and set `PRELUDE_IOS_SDK_URL` in `ios/Podfile.properties.json`.
+
 Then, where ever in your application you want to report the device signals you can use code like this:
 
 ```

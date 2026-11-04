@@ -16,9 +16,23 @@ Which package do I install?
 npm install @prelude.so/react-native-sdk-standalone
 ```
 
-The RN Community CLI autolinks the native module. Rebuild after install
-(`pod install` for iOS, gradle sync for Android). Android requires
-`minSdkVersion 26` and `compileSdkVersion 35` or later.
+The RN Community CLI autolinks the native module. The native SDKs are served
+through your app's distribution links from the Prelude Dashboard; set both,
+then rebuild (`pod install` for iOS, gradle sync for Android):
+
+- `android/build.gradle`, in `allprojects.repositories`:
+
+  ```groovy
+  maven {
+    url("https://<host>/dis_.../maven")
+    content { includeGroup("so.prelude.android") }
+  }
+  ```
+
+- `ios/Podfile.properties.json`: `{ "PRELUDE_IOS_SDK_URL": "https://<host>/dis_.../apple-sdk.git" }`
+  (or export `PRELUDE_IOS_SDK_URL` when running `pod install`)
+
+Android requires `minSdkVersion 26` and `compileSdkVersion 35` or later.
 
 ## Usage
 
@@ -54,6 +68,5 @@ preset). Follow the js-sdk web setup guidance for bundler specifics.
 
 ## Notes
 
-- iOS pulls the Apple SDK sources on install. Set `PRELUDE_SKIP_APPLE_SDK=1` to
-  skip that download (e.g. web-only or Android-only CI).
+- iOS downloads the Apple SDK on `pod install` and verifies its checksums.
 - Web accepts `timeout_milliseconds` / `max_retries` for parity but ignores them.

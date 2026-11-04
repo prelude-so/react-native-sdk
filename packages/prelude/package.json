@@ -1,6 +1,6 @@
 {
   "name": "@prelude.so/react-native-sdk",
-  "version": "0.6.2",
+  "version": "1.0.0-beta.1",
   "description": "Prelude SDK for React Native",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -12,7 +12,6 @@
     "prepare": "expo-module prepare",
     "prepublishOnly": "expo-module prepublishOnly",
     "expo-module": "expo-module",
-    "postinstall": "node scripts/postinstall.js",
     "android": "expo run:android",
     "ios": "expo run:ios"
   },
@@ -28,6 +27,7 @@
     "build/*",
     "ios/Prelude*",
     "scripts/*",
+    "app.plugin.js",
     "src/*",
     "expo-module.config.json",
     "tsconfig.json",
@@ -57,6 +57,7 @@
     "react-native": "*"
   },
   "so_prelude": {
-    "apple_sdk_tag": "0.6.0"
+    "apple_sdk_version": "1.0.0-rc.1",
+    "android_sdk_version": "1.0.0"
   }
 }

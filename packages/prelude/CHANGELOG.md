@@ -2,6 +2,15 @@
 
 Prelude React Native SDK Change Log
 
+## [1.0.0-beta.1]
+
+- Bridge the 1.0.0 Apple and Android SDKs. Both are served through the app's
+  distribution links from the Prelude Dashboard: pass `androidSdkUrl` and
+  `iosSdkUrl` to the new config plugin, or add the Maven link to
+  `android/build.gradle` and `PRELUDE_IOS_SDK_URL` to `Podfile.properties.json`.
+- The Apple SDK is downloaded on `pod install` instead of `npm install`;
+  the `postinstall` script and `PRELUDE_SKIP_APPLE_SDK` are gone.
+
 ## [0.6.2] - 2026-09-21
 
 - Make the Apple SDK `postinstall` download resilient: skip it on non-macOS

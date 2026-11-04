@@ -1,4 +1,5 @@
 import ExpoModulesCore
+import PreludeSignals
 
 public class PreludeReactNativeSdkModule: Module {
     public func definition() -> ModuleDefinition {
