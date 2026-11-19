@@ -1,6 +1,6 @@
 {
   "name": "@prelude.so/react-native-sdk-standalone",
-  "version": "1.0.0-beta.1",
+  "version": "0.1.4",
   "description": "Prelude SDK for React Native (no Expo dependency)",
   "main": "./build/commonjs/index.js",
   "module": "./build/module/index.js",
@@ -21,7 +21,8 @@
     "build": "bob build",
     "prepare": "bob build",
     "clean": "rm -rf build",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "postinstall": "node scripts/postinstall.js"
   },
   "keywords": [
     "react-native",
@@ -36,7 +37,7 @@
     "ios/*.swift",
     "ios/*.h",
     "ios/*.mm",
-    "scripts/fetch-apple-sdk.js",
+    "scripts/postinstall.js",
     "PreludeReactNativeSdkStandalone.podspec",
     "react-native.config.js",
     "tsconfig.json",
@@ -82,7 +83,6 @@
     ]
   },
   "so_prelude": {
-    "apple_sdk_version": "1.0.0-rc.1",
-    "android_sdk_version": "1.0.0"
+    "apple_sdk_tag": "0.6.1"
   }
 }
