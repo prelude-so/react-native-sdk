@@ -1,0 +1,126 @@
+name: Tag and release
+
+# When a package release lands on main, tag it and publish a GitHub Release
+# whose notes are that version's section of the package's CHANGELOG.md.
+#
+# Each package is released on its own. The tag is <npm package name>@<version>,
+# e.g. @prelude.so/react-native-sdk@1.0.0-beta.1, because the packages have
+# separate versions. If the tag already exists, nothing happens for that
+# package, so pushes that don't change a version are no-ops.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - packages/*/package.json
+      - packages/*/CHANGELOG.md
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dir: prelude
+            installable: true
+          - dir: prelude-standalone
+            installable: true
+          # Published only as a dependency of the SDK packages, so its notes
+          # have no install instructions.
+          - dir: prelude-shared
+            installable: false
+    defaults:
+      run:
+        working-directory: packages/${{ matrix.dir }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read package name and version
+        id: version
+        run: |
+          name=$(jq -r .name package.json)
+          version=$(jq -r .version package.json)
+          if [ -z "$name" ] || [ "$name" = null ] || [ -z "$version" ] || [ "$version" = null ]; then
+            echo "::error file=packages/${{ matrix.dir }}/package.json::Could not read name and version"
+            exit 1
+          fi
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$name@$version" >> "$GITHUB_OUTPUT"
+
+      - name: Check whether the tag already exists
+        id: existing
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" > /dev/null; then
+            echo "Tag $TAG already exists; nothing to release."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build release notes
+        if: steps.existing.outputs.exists == 'false'
+        env:
+          NAME: ${{ steps.version.outputs.name }}
+          VERSION: ${{ steps.version.outputs.version }}
+          DIR: ${{ matrix.dir }}
+          INSTALLABLE: ${{ matrix.installable }}
+        run: |
+          # Print everything between "## [VERSION]" and the next "## [" heading.
+          changes=$(awk -v v="$VERSION" '
+            index($0, "## [" v "]") == 1 { found = 1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md | sed -e '/./,$!d')
+
+          if ! printf '%s' "$changes" | grep -q '[^[:space:]]'; then
+            echo "::error file=packages/$DIR/CHANGELOG.md::No '## [$VERSION]' section with content found in CHANGELOG.md"
+            exit 1
+          fi
+
+          {
+            echo "## What's changed"
+            echo
+            echo "$changes"
+            echo
+            if [ "$INSTALLABLE" = true ]; then
+              echo "## Installation"
+              echo
+              echo '```sh'
+              echo "npm install $NAME@$VERSION"
+              echo '```'
+              echo
+            fi
+            echo "**Full changelog:** [CHANGELOG.md](https://github.com/$GITHUB_REPOSITORY/blob/$GITHUB_SHA/packages/$DIR/CHANGELOG.md)"
+          } > "$RUNNER_TEMP/notes.md"
+
+          cat "$RUNNER_TEMP/notes.md"
+
+      - name: Create tag and GitHub Release
+        if: steps.existing.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NAME: ${{ steps.version.outputs.name }}
+          VERSION: ${{ steps.version.outputs.version }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          # Versions like 1.0.0-beta.1 are marked as pre-releases.
+          prerelease=()
+          case "$VERSION" in *-*) prerelease=(--prerelease) ;; esac
+
+          gh release create "$TAG" \
+            --target "$GITHUB_SHA" \
+            --title "$NAME $VERSION" \
+            --notes-file "$RUNNER_TEMP/notes.md" \
+            "${prerelease[@]}"
